@@ -7,8 +7,9 @@ from graphontology.definitions import DATA_DIR
 
 def create_category_node_table():
     db_manager = DB(config['database'])
+    drop_query = "DROP TABLE IF EXISTS `graph_ontology`.`Nodes_N_Category`;"
     create_query = """
-    CREATE TABLE `Nodes_N_Category` (
+    CREATE TABLE `graph_ontology`.`Nodes_N_Category` (
       `institution_id` enum('Ont','EPFL','ETHZ','PSI','Empa','Eawag','WSL') COLLATE utf8mb4_unicode_ci default 'Ont',
       `object_type` enum('Category','Chart','Concept','Course','Dashboard','Exercise','External person','Hardware','Historical figure','Lecture','Learning module','MOOC','News','Notebook','Person','Publication','Specialisation','Startup','Strategic area','StudyPlan','Unit','Widget') COLLATE utf8mb4_unicode_ci DEFAULT 'Category',
       `object_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -31,6 +32,7 @@ def create_category_node_table():
     ) ENGINE=InnoDB AUTO_INCREMENT=2231 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
     try:
+        db_manager.execute_query(drop_query)
         db_manager.execute_query(create_query)
         return True
     except Exception:
@@ -39,8 +41,9 @@ def create_category_node_table():
 
 def create_category_edge_table():
     db_manager = DB(config['database'])
+    drop_query = "DROP TABLE IF EXISTS `graph_ontology`.`Edges_N_Category_N_Category_T_ChildToParent`;"
     create_query = """
-    CREATE TABLE `Edges_N_Category_N_Category_T_ChildToParent` (
+    CREATE TABLE `graph_ontology`.`Edges_N_Category_N_Category_T_ChildToParent` (
       `from_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
       `to_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
       `row_id` int NOT NULL AUTO_INCREMENT,
@@ -51,6 +54,7 @@ def create_category_edge_table():
     ) ENGINE=InnoDB AUTO_INCREMENT=2227 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
     try:
+        db_manager.execute_query(drop_query)
         db_manager.execute_query(create_query)
         return True
     except Exception:
@@ -59,8 +63,9 @@ def create_category_edge_table():
 
 def create_category_cluster_edge_table():
     db_manager = DB(config['database'])
+    drop_query = "DROP TABLE IF EXISTS `graph_ontology`.`Edges_N_Category_N_ConceptsCluster_T_ParentToChild`;"
     create_query = """
-    CREATE TABLE `Edges_N_Category_N_ConceptsCluster_T_ParentToChild` (
+    CREATE TABLE `graph_ontology`.`Edges_N_Category_N_ConceptsCluster_T_ParentToChild` (
       `from_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
       `to_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
       `row_id` int NOT NULL AUTO_INCREMENT,
@@ -71,6 +76,7 @@ def create_category_cluster_edge_table():
     ) ENGINE=InnoDB AUTO_INCREMENT=4814 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
     try:
+        db_manager.execute_query(drop_query)
         db_manager.execute_query(create_query)
         return True
     except Exception:
@@ -79,8 +85,9 @@ def create_category_cluster_edge_table():
 
 def create_cluster_concept_edge_table():
     db_manager = DB(config['database'])
+    drop_query = "DROP TABLE IF EXISTS `graph_ontology`.`Edges_N_ConceptsCluster_N_Concept_T_ParentToChild`;"
     create_query = """
-    CREATE TABLE `Edges_N_ConceptsCluster_N_Concept_T_ParentToChild` (
+    CREATE TABLE `graph_ontology`.`Edges_N_ConceptsCluster_N_Concept_T_ParentToChild` (
       `from_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
       `to_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
       `row_id` int NOT NULL AUTO_INCREMENT,
@@ -91,6 +98,7 @@ def create_cluster_concept_edge_table():
     ) ENGINE=InnoDB AUTO_INCREMENT=40064 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
     try:
+        db_manager.execute_query(drop_query)
         db_manager.execute_query(create_query)
         return True
     except Exception:
@@ -99,8 +107,9 @@ def create_cluster_concept_edge_table():
 
 def create_concept_node_table():
     db_manager = DB(config['database'])
+    drop_query = "DROP TABLE IF EXISTS `graph_ontology`.`Nodes_N_Concept`;"
     create_query = """
-    CREATE TABLE `Nodes_N_Concept` (
+    CREATE TABLE `graph_ontology`.`Nodes_N_Concept` (
       `institution_id` enum('Ont','EPFL','ETHZ','PSI','Empa','Eawag','WSL') COLLATE utf8mb4_unicode_ci DEFAULT 'Ont',
       `object_type` enum('Category','Chart','Concept','Course','Dashboard','Exercise','External person','Hardware','Historical figure','Lecture','Learning module','MOOC','News','Notebook','Person','Publication','Specialisation','Startup','Strategic area','StudyPlan','Unit','Widget') COLLATE utf8mb4_unicode_ci DEFAULT 'Concept',
       `object_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -126,6 +135,7 @@ def create_concept_node_table():
     ) ENGINE=InnoDB AUTO_INCREMENT=6234605 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
     try:
+        db_manager.execute_query(drop_query)
         db_manager.execute_query(create_query)
         return True
     except Exception:
@@ -135,7 +145,9 @@ def create_concept_node_table():
 def init_ontology_tree():
     with open(os.path.join(DATA_DIR, 'ontology_structure.json'), 'r') as f:
         tree_contents = json.load(f)
-
-
-
-
+    create_category_node_table()
+    create_category_edge_table()
+    create_category_cluster_edge_table()
+    create_cluster_concept_edge_table()
+    create_concept_node_table()
+    # TODO add the actual loading of tables from the JSON
