@@ -5,19 +5,15 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dump', type=str, default=None)
+    parser.add_argument('--dump', type=str, required=True)
     args = parser.parse_args()
-    if args.dump is None:
-        print('WARNING: No dump file provided. Only ontology tree tables will be loaded. '
-              'GraphAI ontology endpoints will not work.')
-        init_ontology_tree()
-    else:
-        import_mysql_from_dump(args.dump)
-        # Dump-specific existence checks
-        embedding_exists = verify_table_existence('Edges_N_Concept_N_Concept_T_Embeddings')
-        if not embedding_exists:
-            print('WARNING: Concept to concept embedding similarity table not found. Closest match algorithms '
-                  'in ontology endpoints will not be able to use embeddings.')
+
+    import_mysql_from_dump(args.dump)
+    # Dump-specific existence checks
+    embedding_exists = verify_table_existence('Edges_N_Concept_N_Concept_T_Embeddings')
+    if not embedding_exists:
+        print('WARNING: Concept to concept embedding similarity table not found. Closest match algorithms '
+              'in ontology endpoints will not be able to use embeddings.')
     concept_node_exists = verify_table_existence('Nodes_N_Concept')
     category_node_exists = verify_table_existence('Nodes_N_Category')
     concept_concept_edge_exists = verify_table_existence('Edges_N_Concept_N_Concept_T_Undirected')
