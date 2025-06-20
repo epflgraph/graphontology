@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graphontology"
+version = "0.0.1"
+authors = [
+  { name="Ramtin Yazdanian", email="ramtin.yazdanian@epfl.ch" }
+]
+description = "Tools for GraphOntology (part of EPFLGraph)"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "numpy",
+    "db-cache-manager",
+    "elasticsearch-interface>=0.11.0",
+]
+
+[tool.setuptools]
+packages = ["graphontology"]
