@@ -4,7 +4,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dump', type=str, required=True)
+    parser.add_argument('--dump', type=str, required=True, help="Path of uncompressed MySQL dump file.")
     args = parser.parse_args()
 
     import_mysql_from_dump(args.dump)
