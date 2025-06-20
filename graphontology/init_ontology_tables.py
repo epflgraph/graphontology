@@ -1,4 +1,3 @@
-from graphontology.utils.init_ontology_tree import init_ontology_tree
 from graphontology.utils.common_utils import import_mysql_from_dump, verify_table_existence
 import argparse
 
