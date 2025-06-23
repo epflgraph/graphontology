@@ -28,9 +28,10 @@ port: 23306
 user: mysqluser
 password: mysqlpass
 ```
-Now you are ready to run any of the scripts.
+Now you are ready to run any of the scripts. **To prepare the database and Elasticsearch indexes for 
+a local instance of GraphAI, follow these loading instructions.**
 
-## Loading the ontology for GraphAI
+### Loading the ontology for GraphAI
 
 If you plan to run a local instance of GraphAI, for the `/ontology` endpoints 
 to be enabled you need to have the ontology's tables in your database.
