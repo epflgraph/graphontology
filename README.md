@@ -54,3 +54,6 @@ download the dump, decompress it, and run the following:
 
 The script will automatically check whether you got everything imported correctly and let you know 
 if something has gone wrong.
+
+## Proposing changes to the ontology
+If you want to propose modifications to the ontology, refer to the README file in the `data` subfolder.
