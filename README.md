@@ -48,7 +48,7 @@ Edges_N_Category_N_Concept_T_AnchorPage
 Edges_N_Concept_N_Concept_T_Embeddings
 ```
 
-The GraphOntology data dump contains all of these. In order to load them into your local database,
+The [GraphOntology data dump](https://zenodo.org/records/15726975) contains all of these. In order to load them into your local database,
 download the dump, decompress it, and run the following:
 `python init_ontology_tables.py --dump /path/to/dump.mysql`
 
