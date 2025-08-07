@@ -55,5 +55,26 @@ download the dump, decompress it, and run the following:
 The script will automatically check whether you got everything imported correctly and let you know 
 if something has gone wrong.
 
+### Loading the concept detection index for GraphAI
+The concept detection index is a [compressed dump](https://drive.google.com/file/d/1U9K_QmKLTMOu4qYevZmp04icmUiwjtZW/view?usp=sharing) of the `concepts_detection` index used by GraphAI's `/text` endpoints, created using [Elasticdump](https://github.com/elasticsearch-dump/elasticsearch-dump). It is a tar.gz file containing a folder with three JSON dumps: one for the analyzer, one for the mapping, and one for the data.
+
+To restore them (assuming your ES server is running on, or mapped to, localhost:9201 and secured with authentication), first install elasticdump according to the [instructions](https://github.com/elasticsearch-dump/elasticsearch-dump/blob/master/README.md), then run:
+```
+elasticdump \
+  --input=~/concepts_detection/concepts_detection_mapping.json \
+  --output=https://YOURUSERNAME:YOURPASSWORD@127.0.0.1:9201/concepts_detection \
+  --type=mapping
+elasticdump \
+  --input=~/concepts_detection/concepts_detection_analyzer.json \
+  --output=https://YOURUSERNAME:YOURPASSWORD@127.0.0.1:9201/concepts_detection \
+  --type=analyzer
+elasticdump \
+  --input=~/concepts_detection/concepts_detection_data.json \
+  --output=https://YOURUSERNAME:YOURPASSWORD@127.0.0.1:9201/concepts_detection \
+  --type=data
+```
+
+Be patient as the import may take a while (the data contains over 1.5 million documents, which are the concepts).
+
 ## Proposing changes to the ontology
 If you want to propose modifications to the ontology, refer to the README file in the `data` subfolder.
