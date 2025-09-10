@@ -1,0 +1,35 @@
+# MacOS metadata
+**/.DS_Store
+
+# PyCharm project files
+.idea
+
+# Pycache
+__pycache__
+
+# Celery scheduler database file
+**/celerybeat-schedule.db
+
+# Data files (typically large)
+data
+
+# Config files (might include sensitive information or depend on the deployment)
+/config
+config.ini
+
+# Documentation build files
+docs/build
+docs/source/graphai*.rst
+
+# Python package egg folder
+*egg-info
+
+# Python virtual environment
+venv
+
+# Jupyter-lab files
+**/.ipynb_checkpoints
+
+# Leaks scan files
+leakscan.sh
+gitleaks-report.json
