@@ -1,11 +1,14 @@
+from sqlalchemy import create_engine, text
 import subprocess
-
-from db_cache_manager.db import DB
-
 from graphontology.utils.config import config
 
+# Initialize DB connection
+db_cfg = config["database"]
+engine = create_engine(
+    f"mysql+pymysql://{db_cfg['user']}:{db_cfg['password']}@{db_cfg['host']}:{db_cfg['port']}/{db_cfg['schema']}"
+)
 
-def import_mysql_from_dump(dump_filename, db_name='graph_ontology'):
+def import_mysql_from_dump(dump_filename, verbose=False):
     """
     Imports a MySQL dump file into a database using the mysql command-line tool.
 
@@ -20,6 +23,7 @@ def import_mysql_from_dump(dump_filename, db_name='graph_ontology'):
     db_port = config['database']['port']
     if db_host == 'localhost':
         db_host = '127.0.0.1'
+    db_schema = config['database']['schema']
 
     try:
         # Construct the command to run
@@ -29,30 +33,36 @@ def import_mysql_from_dump(dump_filename, db_name='graph_ontology'):
             f"--password={db_password}",
             f"--host={db_host}",
             f"--port={db_port}",
-            db_name
+            f"--database={db_schema}"
         ]
 
-        print(f'Starting to load dump into MySQL schema `{db_name}`')
+        if verbose:
+            print(f'Starting to load dump into MySQL schema `{db_schema}`')
+
         # Open the dump file and pass it to the mysql command
         with open(dump_filename, "rb") as dump_file:
             subprocess.run(command, stdin=dump_file, check=True)
 
-        print(f"Successfully imported dump file into database '{db_name}'.")
+        if verbose:
+            print(f"Successfully imported dump file into database '{db_schema}'.")
 
     except subprocess.CalledProcessError as e:
-        print(f"Error during MySQL import: {e}")
+        if verbose:
+            print(f"Error during MySQL import: {e}")
     except FileNotFoundError:
-        print(f"Dump file '{dump_filename}' not found.")
+        if verbose:
+            print(f"Dump file '{dump_filename}' not found.")
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        if verbose:
+            print(f"Unexpected error: {e}")
 
 
-def verify_table_existence(table_name, db_name='graph_ontology'):
-    db_manager = DB(config['database'])
-    count = db_manager.execute_query(
-        "SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = %s) AND (TABLE_NAME = %s)",
-        values=(db_name, table_name)
-    )
+def verify_table_existence(table_name):
+
+    with engine.connect() as conn:
+        result = conn.execute(text(f"SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = '{db_cfg['schema']}') AND (TABLE_NAME = '{table_name}')"))
+        count = result.fetchall()[0][0]
+
     if count > 0:
         return True
     return False

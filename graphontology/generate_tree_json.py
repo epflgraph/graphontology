@@ -1,29 +1,35 @@
-from db_cache_manager.db import DB
+from sqlalchemy import create_engine, text
 from graphontology.utils.config import config
 from graphontology.definitions import DATA_DIR
 from collections import defaultdict
-import os
-import json
+import os, json, rich
 
+# Initialize DB connection
+db_cfg = config["database"]
+engine = create_engine(
+    f"mysql+pymysql://{db_cfg['user']}:{db_cfg['password']}@{db_cfg['host']}:{db_cfg['port']}/{db_cfg['schema']}"
+)
 
-full_tree_query = """
-SELECT f.to_id AS level0_category_id, g.to_id AS level1_category_id, a.to_id AS level2_category_id,
-       b.to_id AS level3_category_id, b.from_id AS level4_category_id,
-	   c.to_id AS cluster_id, d.to_id AS concept_id, e.name AS name
-    FROM graph_ontology.Edges_N_Category_N_Category_T_ChildToParent f
-    INNER JOIN graph_ontology.Edges_N_Category_N_Category_T_ChildToParent g
-    INNER JOIN graph_ontology.Edges_N_Category_N_Category_T_ChildToParent a
-    INNER JOIN graph_ontology.Edges_N_Category_N_Category_T_ChildToParent b
-    INNER JOIN graph_ontology.Edges_N_Category_N_ConceptsCluster_T_ParentToChild c
-    INNER JOIN graph_ontology.Edges_N_ConceptsCluster_N_Concept_T_ParentToChild d
-    INNER JOIN graph_ontology.Nodes_N_Concept e
-    ON f.from_id=g.to_id AND g.from_id=a.to_id AND a.from_id=b.to_id AND b.from_id=c.from_id AND c.to_id=d.from_id AND d.to_id=e.id;
+full_tree_query = f"""
+    SELECT f.to_id AS level0_category_id, g.to_id AS level1_category_id, a.to_id AS level2_category_id,
+           b.to_id AS level3_category_id, b.from_id AS level4_category_id,
+           c.to_id AS cluster_id, d.to_id AS concept_id, e.name AS name
+      FROM {db_cfg['schema']}.Edges_N_Category_N_Category_T_ChildToParent f
+INNER JOIN {db_cfg['schema']}.Edges_N_Category_N_Category_T_ChildToParent g
+INNER JOIN {db_cfg['schema']}.Edges_N_Category_N_Category_T_ChildToParent a
+INNER JOIN {db_cfg['schema']}.Edges_N_Category_N_Category_T_ChildToParent b
+INNER JOIN {db_cfg['schema']}.Edges_N_Category_N_ConceptsCluster_T_ParentToChild c
+INNER JOIN {db_cfg['schema']}.Edges_N_ConceptsCluster_N_Concept_T_ParentToChild d
+INNER JOIN {db_cfg['schema']}.Nodes_N_Concept e
+        ON f.from_id=g.to_id AND g.from_id=a.to_id AND a.from_id=b.to_id AND b.from_id=c.from_id AND c.to_id=d.from_id AND d.to_id=e.id;
 """
 
-
 def generate_tree_json():
-    db_man = DB(config['database'])
-    data = db_man.execute_query(full_tree_query)
+    
+    with engine.connect() as conn:
+        result = conn.execute(text(full_tree_query))
+        data = result.fetchall()
+
     data = [
         {
             "category_name_0": entry[0],
@@ -65,7 +71,8 @@ def generate_tree_json():
 
     nested_dict_output = to_dict(nested)
     with open(os.path.join(DATA_DIR, 'ontology_structure.json'), 'w') as f:
-        json.dump(nested_dict_output, f)
+        rich.print_json(data=nested_dict_output)
+        # json.dump(nested_dict_output, f)
 
 
 if __name__ == '__main__':
