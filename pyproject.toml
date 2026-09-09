@@ -17,9 +17,17 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
+    "questionary",
     "db-cache-manager",
     "elasticsearch-interface>=0.11.0",
+    "typer",
+    # Git dependency (PEP 508 syntax)
+    "graphdb-client @ git+https://github.com/epflgraph/graphdb-client.git",
+    "graphes-client @ git+https://github.com/epflgraph/graphes-client.git",
 ]
 
 [tool.setuptools]
 packages = ["graphontology"]
+
+[project.scripts]
+graphontology = "graphontology.cli:app"
